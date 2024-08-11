@@ -15,6 +15,10 @@ export class CreateUserDto {
   @IsString()
   nickName: string;
 
+  @ApiProperty()
+  @IsString()
+  name: string;
+
   @ApiPropertyOptional({ enum: user_gender })
   @IsEnum(user_gender)
   @IsOptional()
@@ -28,10 +32,10 @@ export class CreateUserDto {
   @ApiPropertyOptional()
   @IsDate()
   @IsOptional()
-  childBirth: Date;
+  childBirth: Date | null;
 
   @ApiPropertyOptional({ description: '출산예정일' })
   @IsDate()
   @IsOptional()
-  dueDate: Date;
+  dueDate: Date | null;
 }
