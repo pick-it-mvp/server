@@ -6,3 +6,144 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model users {
+  id               Int                @id @default(autoincrement())
+  email            String             @unique
+  password         String?
+  age              Int?
+  name             String?
+  region           String?
+  dueDate          DateTime?
+  childBirth       DateTime?
+  userMode         user_type?
+  gender           user_gender?
+  withdrew_at      DateTime?
+  registrationDate DateTime           @default(now())
+  updated_at       DateTime           @default(now()) @updatedAt
+  nickName         String?
+  is_ended         Boolean            @default(false)
+  searches         user_searches[]
+  questions        questions[]
+  question_replies question_replies[]
+  question_views   question_views[]
+}
+
+model user_searches {
+  id         Int      @id @default(autoincrement())
+  uid        Int
+  food_id    Int
+  created_at DateTime @default(now())
+  user       users    @relation(fields: [uid], references: [id])
+  food       foods    @relation(fields: [food_id], references: [id])
+
+  @@index([uid])
+  @@index([food_id])
+}
+
+model food_cateogries {
+  id         Int      @id @default(autoincrement())
+  name       String
+  image      String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  foods      foods[]
+}
+
+model foods {
+  id          Int              @id @default(autoincrement())
+  name        String
+  desc        String
+  status      food_status      @default(GOOD)
+  image       String           @default("dummy")
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @default(now()) @updatedAt
+  tags        String[]
+  category_id Int?
+  crawlings   food_crawlings[]
+  category    food_cateogries? @relation(fields: [category_id], references: [id])
+  searches    user_searches[]
+}
+
+model food_crawlings {
+  id      Int    @id @default(autoincrement())
+  title   String @default("default")
+  desc    String
+  url     String
+  food_id Int
+  food    foods  @relation(fields: [food_id], references: [id])
+}
+
+model tips {
+  id             Int       @id @default(autoincrement())
+  type           user_type @default(embryo)
+  content        String
+  conditionStart DateTime?
+  conditionEnd   DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @default(now()) @updatedAt
+}
+
+model questions {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  ai_reply   String?
+  uid        Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  user    users              @relation(fields: [uid], references: [id])
+  likes   user_likes[]
+  replies question_replies[]
+  views   question_views[]
+}
+
+model question_views {
+  id          Int       @id @default(autoincrement())
+  question_id Int
+  uid         Int
+  created_at  DateTime  @default(now())
+  question    questions @relation(fields: [question_id], references: [id])
+  user        users     @relation(fields: [uid], references: [id])
+}
+
+model question_replies {
+  id          Int       @id @default(autoincrement())
+  question_id Int
+  uid         Int
+  content     String
+  user        users     @relation(fields: [uid], references: [id])
+  question    questions @relation(fields: [question_id], references: [id])
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now()) @updatedAt
+}
+
+model user_likes {
+  id          Int       @id @default(autoincrement())
+  question_id Int
+  created_at  DateTime  @default(now())
+  question    questions @relation(fields: [question_id], references: [id])
+}
+
+enum user_provider {
+  KAKAO
+  GOOGLE
+  CUSTOM
+}
+
+enum user_type {
+  embryo
+  baby
+}
+
+enum user_gender {
+  f
+  m
+}
+
+enum food_status {
+  GOOD
+  BAD
+  WARNING
+}
