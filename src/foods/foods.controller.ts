@@ -7,6 +7,10 @@ import { FoodsService } from './foods.service';
 export class FoodsController {
   constructor(private readonly foodsService: FoodsService) {}
 
+  @Get('recommend')
+  getRecommend() {
+    return this.foodsService.getRecommend();
+  }
   @Get('categories')
   getCategory() {
     return this.foodsService.getCategory();

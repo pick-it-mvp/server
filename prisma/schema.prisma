@@ -75,13 +75,14 @@ model food_crawlings {
 }
 
 model tips {
-  id             Int       @id @default(autoincrement())
-  type           user_type @default(embryo)
-  content        String
-  conditionStart DateTime?
-  conditionEnd   DateTime?
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @default(now()) @updatedAt
+  id                   Int       @id @default(autoincrement())
+  type                 user_type @default(embryo)
+  title String
+  content              String
+  condition_start_week Int?
+  condition_end_week   Int?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @default(now()) @updatedAt
 }
 
 model questions {

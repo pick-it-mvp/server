@@ -9,11 +9,26 @@ export class TipsService {
     @Inject('REQUEST') private req: Request,
   ) {}
 
-  getRandom() {
-    const { userMode } = this.req.user;
+  calculatePregnancyWeeks(dueDate) {
+    const now = new Date();
+    const dueDateObj = new Date(dueDate);
+
+    const differenceInMs = Math.abs(now.getTime() - dueDateObj.getTime());
+
+    const weeks = Math.floor(differenceInMs / (1000 * 60 * 60 * 24 * 7));
+
+    return weeks;
+  }
+
+  async getRandom() {
+    const { id } = this.req.user;
+    const { dueDate, userMode } = await this.prisma.users.findUniqueOrThrow({
+      where: { id },
+      select: { userMode: true, dueDate: true },
+    });
 
     return this.prisma.$queryRaw`
-      SELECT id, type, content, conditionStart, conditionEnd FROM tips WHERE type = ${userMode} ORDER BY random() limit 3
+      SELECT id, type, title, content, condition_start_week, condition_end_week FROM tips WHERE type = ${userMode}::user_type ${userMode !== 'baby' ? `AND condition_start_week <= ${this.calculatePregnancyWeeks(dueDate)} AND condition_end_week >= ${this.calculatePregnancyWeeks(dueDate)}` : ''} ORDER BY random() limit 3
     `;
   }
 }

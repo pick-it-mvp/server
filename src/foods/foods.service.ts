@@ -36,6 +36,12 @@ export class FoodsService {
     return food || 'null';
   }
 
+  getRecommend() {
+    return this.prisma.$queryRaw`
+      SELECT id, image, name FROM foods ORDER BY random() limit 3
+    `;
+  }
+
   getCategory() {
     return this.prisma.food_cateogries.findMany({
       select: {
