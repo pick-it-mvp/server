@@ -1,5 +1,5 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -153,12 +153,13 @@ export class AuthService {
     return this.req.user;
   }
 
-  signUp(data: CreateUserDto) {
-    const { password } = data;
+  async signUp(data: CreateUserDto) {
+    const { email, password } = data;
 
     data.password = bcrypt.hashSync(password, 10);
 
-    return this.user.create(data);
+    if (await this.user.findOneByEmail(email)) throw new ConflictException('Already registed this email');
+    else return this.user.create(data);
   }
 
   async signIn(data: LoginUserDto) {
