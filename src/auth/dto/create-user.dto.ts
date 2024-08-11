@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { user_gender, user_type } from '@prisma/client';
+import { Type } from 'class-transformer';
 import { IsDate, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto {
@@ -30,11 +31,13 @@ export class CreateUserDto {
   userMode: user_type;
 
   @ApiPropertyOptional()
+  @Type(() => Date)
   @IsDate()
   @IsOptional()
   childBirth: Date | null;
 
   @ApiPropertyOptional({ description: '출산예정일' })
+  @Type(() => Date)
   @IsDate()
   @IsOptional()
   dueDate: Date | null;
