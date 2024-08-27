@@ -27,8 +27,8 @@ export class TipsService {
       select: { userMode: true, dueDate: true },
     });
 
-    return this.prisma.$queryRaw`
-      SELECT id, type, title, content, condition_start_week, condition_end_week FROM tips WHERE type = ${userMode}::user_type ${userMode !== 'baby' ? `AND condition_start_week <= ${this.calculatePregnancyWeeks(dueDate)} AND condition_end_week >= ${this.calculatePregnancyWeeks(dueDate)}` : ''} ORDER BY random() limit 3
-    `;
+    return this.prisma.$queryRawUnsafe(`
+      SELECT id, type, title, content, condition_start_week, condition_end_week FROM tips WHERE type = '${userMode}'::user_type ${userMode !== 'baby' ? `AND condition_start_week <= ${this.calculatePregnancyWeeks(dueDate)} AND condition_end_week >= ${this.calculatePregnancyWeeks(dueDate)}` : ''} ORDER BY random() limit 3
+    `);
   }
 }
